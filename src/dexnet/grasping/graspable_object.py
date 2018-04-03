@@ -29,8 +29,8 @@ import copy
 import logging
 import numpy as np
 
-import meshpy.mesh as m
-import meshpy.sdf as s
+import meshpy_berkeley.mesh as m
+import meshpy_berkeley.sdf as s
 
 import IPython
 import matplotlib.pyplot as plt

@@ -40,8 +40,8 @@ import time
 
 from dexnet.grasping import PointGrasp, GraspableObject3D, GraspQualityConfig
 
-import meshpy.obj_file as obj_file
-import meshpy.sdf_file as sdf_file
+import meshpy_berkeley.obj_file as obj_file
+import meshpy_berkeley.sdf_file as sdf_file
 
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D

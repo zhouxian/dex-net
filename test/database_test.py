@@ -36,8 +36,8 @@ from autolab_core import RigidTransform, YamlConfig
 
 from perception import CameraIntrinsics, RenderMode
 
-from meshpy.obj_file import ObjFile
-from meshpy.mesh_renderer import ViewsphereDiscretizer, VirtualCamera
+from meshpy_berkeley.obj_file import ObjFile
+from meshpy_berkeley.mesh_renderer import ViewsphereDiscretizer, VirtualCamera
 
 from dexnet.constants import READ_WRITE_ACCESS
 from dexnet.database import Hdf5Database, MeshProcessor, RescalingType

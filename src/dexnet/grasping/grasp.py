@@ -33,7 +33,7 @@ from numpy.linalg import inv, norm
 import time
 
 from autolab_core import Point, RigidTransform
-from meshpy import Sdf3D, StablePose
+from meshpy_berkeley import Sdf3D, StablePose
 
 try:
     from gqcnn import Grasp2D

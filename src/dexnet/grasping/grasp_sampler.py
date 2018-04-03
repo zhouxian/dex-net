@@ -104,7 +104,7 @@ class GraspSampler:
         ----------
         graspable : :obj:`GraspableObject3D`
             the object to grasp
-        stable_poses : :obj:`list` of :obj:`meshpy.StablePose`
+        stable_poses : :obj:`list` of :obj:`meshpy_berkeley.StablePose`
             list of stable poses for the object with ids read from the database
         target_num_grasps : int
             number of grasps to return, defualts to self.target_num_grasps

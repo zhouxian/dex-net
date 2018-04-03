@@ -29,9 +29,9 @@ import IPython
 import logging
 import numpy as np
 
-import meshpy.mesh as mesh
-import meshpy.sdf as sdf
-import meshpy.stable_pose as stp
+import meshpy_berkeley.mesh as mesh
+import meshpy_berkeley.sdf as sdf
+import meshpy_berkeley.stable_pose as stp
 
 from autolab_core import RigidTransform
 from perception import BinaryImage, ColorImage, DepthImage, ObjectRender, RenderMode

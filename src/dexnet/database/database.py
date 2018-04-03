@@ -43,10 +43,10 @@ from dexnet.database.keys import *
 
 from dexnet.grasping import GraspableObject3D
 
-import meshpy.obj_file as obj_file
-import meshpy.sdf_file as sdf_file
-import meshpy.stp_file as stp_file
-from meshpy import UrdfWriter
+import meshpy_berkeley.obj_file as obj_file
+import meshpy_berkeley.sdf_file as sdf_file
+import meshpy_berkeley.stp_file as stp_file
+from meshpy_berkeley import UrdfWriter
 
 from perception import RenderMode
 
@@ -503,7 +503,7 @@ class Hdf5Dataset(Dataset):
         ----------
         key : :obj:`str`
             key of object
-        mesh : :obj:`meshpy.Mesh3D`
+        mesh : :obj:`meshpy_berkeley.Mesh3D`
             mesh to store
         force_overwrite : bool
             whether or not to overwrite
@@ -533,7 +533,7 @@ class Hdf5Dataset(Dataset):
         ----------
         key : :obj:`str`
             key of object
-        convex_pieces : :obj:`list` of :obj:`meshpy.Mesh3D`
+        convex_pieces : :obj:`list` of :obj:`meshpy_berkeley.Mesh3D`
             convex pieces to store
         force_overwrite : bool
             whether or not to overwrite convex pieces
@@ -566,7 +566,7 @@ class Hdf5Dataset(Dataset):
         ----------
         key : :obj:`str`
             key of object
-        stable_poses : :obj:`list` of :obj:`meshpy.StablePose`
+        stable_poses : :obj:`list` of :obj:`meshpy_berkeley.StablePose`
             stable poses to store
         force_overwrite : bool
             whether or not to overwrite stable poses

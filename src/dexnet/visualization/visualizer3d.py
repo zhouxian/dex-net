@@ -42,9 +42,9 @@ from autolab_core import RigidTransform, Point
 from dexnet.grasping import RobotGripper
 from visualization import Visualizer3D
 
-from meshpy import StablePose
-import meshpy.obj_file as objf
-import meshpy.mesh as m
+from meshpy_berkeley import StablePose
+import meshpy_berkeley.obj_file as objf
+import meshpy_berkeley.mesh as m
 
 class DexNetVisualizer3D(Visualizer3D):
     """

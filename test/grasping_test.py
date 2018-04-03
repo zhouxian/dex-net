@@ -37,8 +37,8 @@ from perception import CameraIntrinsics
 
 from dexnet.grasping import Contact3D, ParallelJawPtGrasp3D, GraspableObject3D, UniformGraspSampler, AntipodalGraspSampler, GraspQualityConfigFactory, GraspQualityFunctionFactory, RobotGripper, PointGraspMetrics3D
 
-from meshpy.obj_file import ObjFile
-from meshpy.sdf_file import SdfFile
+from meshpy_berkeley.obj_file import ObjFile
+from meshpy_berkeley.sdf_file import SdfFile
 from constants import *
 
 CONFIG = YamlConfig(TEST_CONFIG_NAME)

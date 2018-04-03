@@ -30,7 +30,7 @@ import sys
 
 import IPython
 
-import meshpy.obj_file as obj_file
+import meshpy_berkeley.obj_file as obj_file
 
 from autolab_core import RigidTransform
 

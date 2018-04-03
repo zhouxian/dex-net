@@ -33,7 +33,7 @@ database_name : str
 target_object_keys : :obj:`OrderedDict`
     dictionary mapping dataset names to target objects (either 'all' or a list of specific object keys)
 env_rv_params : :obj:`OrderedDict`
-    parameters of the camera and object random variables used in sampling (see meshpy.UniformPlanarWorksurfaceImageRandomVariable for more info)
+    parameters of the camera and object random variables used in sampling (see meshpy_berkeley.UniformPlanarWorksurfaceImageRandomVariable for more info)
 gripper_name : str
     name of the gripper to use
 """
@@ -55,7 +55,7 @@ from autolab_core import Point, RigidTransform, YamlConfig
 import autolab_core.utils as utils
 from gqcnn import Grasp2D
 from gqcnn import Visualizer as vis2d
-from meshpy import ObjFile, RenderMode, SceneObject, UniformPlanarWorksurfaceImageRandomVariable
+from meshpy_berkeley import ObjFile, RenderMode, SceneObject, UniformPlanarWorksurfaceImageRandomVariable
 from perception import CameraIntrinsics, BinaryImage, DepthImage
 
 from dexnet.constants import READ_ONLY_ACCESS
@@ -103,7 +103,7 @@ def generate_gqcnn_dataset(dataset_path,
     target_object_keys : :obj:`OrderedDict`
         dictionary mapping dataset names to target objects (either 'all' or a list of specific object keys)
     env_rv_params : :obj:`OrderedDict`
-        parameters of the camera and object random variables used in sampling (see meshpy.UniformPlanarWorksurfaceImageRandomVariable for more info)
+        parameters of the camera and object random variables used in sampling (see meshpy_berkeley.UniformPlanarWorksurfaceImageRandomVariable for more info)
     gripper_name : str
         name of the gripper to use
     config : :obj:`autolab_core.YamlConfig`

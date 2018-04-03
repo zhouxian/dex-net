@@ -30,9 +30,9 @@ import numpy as np
 import os
 import sklearn.decomposition
 
-import meshpy.obj_file as obj_file
-import meshpy.stp_file as stp_file
-import meshpy.sdf_file as sdf_file
+import meshpy_berkeley.obj_file as obj_file
+import meshpy_berkeley.stp_file as stp_file
+import meshpy_berkeley.sdf_file as sdf_file
 import xml.etree.cElementTree as et
 
 from dexnet.constants import *

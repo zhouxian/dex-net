@@ -36,7 +36,7 @@ logger.setLevel(logging.INFO)
 from autolab_core import YamlConfig, RigidTransform
 
 #TODO
-#Once trimesh integration is here via meshpy remove this
+#Once trimesh integration is here via meshpy_berkeley remove this
 import trimesh
 
 import dexnet.database.database as db
@@ -45,7 +45,7 @@ import dexnet.grasping.grasp_quality_function as gqf
 import dexnet.grasping.grasp_sampler as gs
 import dexnet.grasping.gripper as gr
 import dexnet.database.mesh_processor as mp
-from meshpy import convex_decomposition, Mesh3D
+from meshpy_berkeley import convex_decomposition, Mesh3D
 try:
     from dexnet.visualization import DexNetVisualizer3D as vis
 except:
@@ -242,7 +242,7 @@ class DexNet(object):
             self._attach_metadata()
     
     #TODO
-    #Once trimesh integration is here via meshpy remove this
+    #Once trimesh integration is here via meshpy_berkeley remove this
     @staticmethod
     def _meshpy_to_trimesh(mesh_m3d):
         vertices = mesh_m3d.vertices
@@ -250,7 +250,7 @@ class DexNet(object):
         mesh_tm = trimesh.Trimesh(vertices, faces)
         return mesh_tm
     #TODO
-    #Once trimesh integration is here via meshpy remove this
+    #Once trimesh integration is here via meshpy_berkeley remove this
     @staticmethod
     def _trimesh_to_meshpy(mesh_tm):
         vertices = mesh_tm.vertices
@@ -258,7 +258,7 @@ class DexNet(object):
         mesh_m3d = Mesh3D(vertices, triangles)
         return mesh_m3d
     #TODO
-    #Once trimesh integration is here via meshpy remove this
+    #Once trimesh integration is here via meshpy_berkeley remove this
     @staticmethod
     def is_watertight(mesh):
         mesh_tm = DexNet._meshpy_to_trimesh(mesh)
@@ -363,7 +363,7 @@ class DexNet(object):
             raise RuntimeError("Connected components data already exists for object {}, aborting".format(object_name))
             
         #TODO
-        #Fix this once trimesh functionality is integrated into meshpy
+        #Fix this once trimesh functionality is integrated into meshpy_berkeley
         ccs_trm = DexNet._meshpy_to_trimesh(self.dataset.mesh(object_name)).split(only_watertight=False)
         ccs_m3d = []
         for cc in ccs_trm:
@@ -538,7 +538,7 @@ class DexNet(object):
         
         Returns
         ------
-        :obj:`list` of :obj:`meshpy.StablePose`
+        :obj:`list` of :obj:`meshpy_berkeley.StablePose`
             Stable poses of object
         """
         self._check_opens()

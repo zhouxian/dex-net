@@ -63,7 +63,7 @@ cd ..
 cd ${MODULES_DIR}
 git clone https://github.com/BerkeleyAutomation/autolab_core.git
 git clone https://github.com/zhouxian/perception.git
-git clone https://github.com/zhouxian/gqcnn.git
+git clone https://github.com/BerkeleyAutomation/gqcnn.git
 git clone https://github.com/zhouxian/meshpy_berkeley.git
 git clone https://github.com/BerkeleyAutomation/visualization.git
 
