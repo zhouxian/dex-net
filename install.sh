@@ -66,9 +66,15 @@ git clone https://github.com/zhouxian/perception.git
 git clone https://github.com/BerkeleyAutomation/gqcnn.git
 git clone https://github.com/zhouxian/meshpy_berkeley.git
 git clone https://github.com/BerkeleyAutomation/visualization.git
+git clone https://github.com/BerkeleyAutomation/meshrender.git
 
 # install meshpy_berkeley
 cd meshpy_berkeley
+python setup.py develop
+cd ../
+
+# install meshrender
+cd meshrender
 python setup.py develop
 cd ../
 

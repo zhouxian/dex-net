@@ -1,4 +1,5 @@
-This is a modified version of Berkely AUTOLAB's Dex-Net package with change on dependencies to resolve the naming conflict of berkeley's [meshpy](https://github.com/BerkeleyAutomation/meshpy) and [inducer/meshpy](https://github.com/inducer/meshpy).
+This is a modified version of Berkely AUTOLAB's Dex-Net package.
+It 1. fixed rendering issue by installing meshrender from [meshrender](https://github.com/BerkeleyAutomation/meshrender). 2. made changes on dependencies to resolve the naming conflict of berkeley's [meshpy](https://github.com/BerkeleyAutomation/meshpy) and [inducer/meshpy](https://github.com/inducer/meshpy).
 
 # Berkeley AUTOLAB's Dex-Net Package
 
