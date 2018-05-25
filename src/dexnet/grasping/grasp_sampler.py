@@ -156,6 +156,8 @@ class GraspSampler:
         :obj:`list` of :obj:`ParallelJawPtGrasp3D`
             list of generated grasps
         """
+        import IPython
+        IPython.embed()
         # get num grasps 
         if target_num_grasps is None:
             target_num_grasps = self.target_num_grasps
