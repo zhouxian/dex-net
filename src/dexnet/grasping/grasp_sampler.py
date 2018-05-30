@@ -156,8 +156,8 @@ class GraspSampler:
         :obj:`list` of :obj:`ParallelJawPtGrasp3D`
             list of generated grasps
         """
-        import IPython
-        IPython.embed()
+        # import IPython
+        # IPython.embed()
         # get num grasps 
         if target_num_grasps is None:
             target_num_grasps = self.target_num_grasps
@@ -168,8 +168,11 @@ class GraspSampler:
         while num_grasps_remaining > 0 and k <= max_iter:
             # SAMPLING: generate more than we need
             num_grasps_generate = grasp_gen_mult * num_grasps_remaining
+            # new_grasps = self.sample_grasps(graspable, num_grasps_generate,
+                                               # vis, **kwargs)
             new_grasps = self.sample_grasps(graspable, num_grasps_generate,
-                                               vis, **kwargs)
+                                               vis, max_num_samples=100, **kwargs)
+            
 
             # COVERAGE REJECTION: prune grasps by distance
             pruned_grasps = []
@@ -237,6 +240,8 @@ class UniformGraspSampler(GraspSampler):
         :obj:`list` of :obj:`ParallelJawPtGrasp3D`
            list of generated grasps
         """
+        # import IPython
+        # IPython.embed()
         # get all surface points
         surface_points, _ = graspable.sdf.surface_points(grid_basis=False)
         num_surface = surface_points.shape[0]
@@ -245,6 +250,7 @@ class UniformGraspSampler(GraspSampler):
 
         # get all grasps
         while len(grasps) < num_grasps and i < max_num_samples:
+            print(i)
             # get candidate contacts
             indices = np.random.choice(num_surface, size=2, replace=False)
             c0 = surface_points[indices[0], :]
@@ -254,12 +260,14 @@ class UniformGraspSampler(GraspSampler):
                 # compute centers and axes
                 grasp_center = ParallelJawPtGrasp3D.center_from_endpoints(c0, c1)
                 grasp_axis = ParallelJawPtGrasp3D.axis_from_endpoints(c0, c1)
+                # print(c0, c1)
                 g = ParallelJawPtGrasp3D(ParallelJawPtGrasp3D.configuration_from_params(grasp_center,
                                                                                         grasp_axis,
                                                                                         self.gripper.max_width))
                 # keep grasps if the fingers close
                 success, contacts = g.close_fingers(graspable)
                 if success:
+                    # print('S')
                     grasps.append(g)
             i += 1
 

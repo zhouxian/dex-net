@@ -440,6 +440,8 @@ class ParallelJawPtGrasp3D(PointGrasp):
         c2 : :obj:`Contact3D`
             the contact point for jaw 2
         """
+        # import IPython
+        # IPython.embed()
         # compute num samples to use based on sdf resolution
         grasp_width_grid = obj.sdf.transform_pt_obj_to_grid(self.max_grasp_width_)
         num_samples = int(Grasp.samples_per_grid * float(grasp_width_grid) / 2) # at least 1 sample per grid

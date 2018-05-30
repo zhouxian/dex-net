@@ -363,12 +363,14 @@ class DexNet(object):
 
         # create grasp sampler
         logger.info('Sampling grasps')
-        if config['grasp_sampler'] == 'antipodal':
-            sampler = gs.AntipodalGraspSampler(gripper, config)
-        elif config['grasp_sampler'] == 'gaussian':
-            sampler = gs.GaussianGraspSampler(gripper, config)
-        elif config['grasp_sampler'] == 'uniform':
-            sampler = gs.UniformGraspSampler(gripper, config)
+        # if config['grasp_sampler'] == 'antipodal':
+        #     sampler = gs.AntipodalGraspSampler(gripper, config)
+        # elif config['grasp_sampler'] == 'gaussian':
+        #     sampler = gs.GaussianGraspSampler(gripper, config)
+        # elif config['grasp_sampler'] == 'uniform':
+        #     sampler = gs.UniformGraspSampler(gripper, config)
+
+        sampler = gs.UniformGraspSampler(gripper, config)
 
         # sample grasps
         grasps = sampler.generate_grasps(obj, max_iter=config['max_grasp_sampling_iters'])
@@ -441,6 +443,8 @@ class DexNet(object):
                 logger.info('Sampling grasps for object %s' %(object_name))
                 grasps_start = time.time()
                 obj = self.dataset[object_name]
+                import IPython
+                IPython.embed()
                 grasps = DexNet._single_obj_grasps(self.dataset, obj, gripper, config, stable_pose_id=stable_pose)
                 self.dataset.store_grasps(obj.key, grasps, gripper=gripper.name)
                 self.database.flush()
