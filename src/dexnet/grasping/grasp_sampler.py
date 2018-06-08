@@ -168,10 +168,10 @@ class GraspSampler:
         while num_grasps_remaining > 0 and k <= max_iter:
             # SAMPLING: generate more than we need
             num_grasps_generate = grasp_gen_mult * num_grasps_remaining
-            # new_grasps = self.sample_grasps(graspable, num_grasps_generate,
-                                               # vis, **kwargs)
             new_grasps = self.sample_grasps(graspable, num_grasps_generate,
-                                               vis, max_num_samples=100, **kwargs)
+                                               vis, **kwargs)
+            # new_grasps = self.sample_grasps(graspable, num_grasps_generate,
+            #                                    vis, max_num_samples=100, **kwargs)
             
 
             # COVERAGE REJECTION: prune grasps by distance
