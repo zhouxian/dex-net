@@ -35,10 +35,21 @@ ros)
 esac
 
 # install apt deps
-sudo apt-get install cmake libvtk5-dev python-vtk python-sip python-qt4 libosmesa6-dev meshlab libhdf5-dev
-
+sudo apt-get install cmake libvtk5-dev python-vtk python-sip python-qt4 libosmesa6-dev meshlab libhdf5-dev libboost-python-dev
 # install pip deps
 pip install numpy scipy scikit-learn scikit-image opencv-python pyassimp tensorflow h5py mayavi matplotlib catkin_pkg multiprocess dill cvxopt ipython pillow pyhull setproctitle trimesh meshpy
+pip install msgpack
+
+# install assimp
+cd ..
+git clone https://github.com/assimp/assimp.git
+cd assimp
+cmake CMakeLists.txt -G 'Unix Makefiles'
+sudo make
+sudo make install
+cd ..
+sudo rm -rf assimp
+cd dex-net
 
 # install deps from source
 mkdir deps
@@ -54,6 +65,9 @@ cd ..
 git clone https://github.com/jeffmahler/Boost.NumPy.git
 cd Boost.NumPy
 sudo sh install.sh
+sudo sh -c "echo '/usr/local/lib
+/usr/local/lib64' > /etc/ld.so.conf.d/boost_numpy.conf"
+sudo ldconfig
 cd ..
 
 # return to dex-net directory

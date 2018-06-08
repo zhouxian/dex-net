@@ -168,10 +168,10 @@ class GraspSampler:
         while num_grasps_remaining > 0 and k <= max_iter:
             # SAMPLING: generate more than we need
             num_grasps_generate = grasp_gen_mult * num_grasps_remaining
-            # new_grasps = self.sample_grasps(graspable, num_grasps_generate,
-                                               # vis, **kwargs)
             new_grasps = self.sample_grasps(graspable, num_grasps_generate,
-                                               vis, max_num_samples=100, **kwargs)
+                                               vis, **kwargs)
+            # new_grasps = self.sample_grasps(graspable, num_grasps_generate,
+            #                                    vis, max_num_samples=100, **kwargs)
             
 
             # COVERAGE REJECTION: prune grasps by distance
@@ -250,7 +250,6 @@ class UniformGraspSampler(GraspSampler):
 
         # get all grasps
         while len(grasps) < num_grasps and i < max_num_samples:
-            print(i)
             # get candidate contacts
             indices = np.random.choice(num_surface, size=2, replace=False)
             c0 = surface_points[indices[0], :]
