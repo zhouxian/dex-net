@@ -250,7 +250,6 @@ class UniformGraspSampler(GraspSampler):
 
         # get all grasps
         while len(grasps) < num_grasps and i < max_num_samples:
-            print(i)
             # get candidate contacts
             indices = np.random.choice(num_surface, size=2, replace=False)
             c0 = surface_points[indices[0], :]
