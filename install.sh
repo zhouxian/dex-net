@@ -36,8 +36,15 @@ esac
 
 # install apt deps
 sudo apt-get install cmake libvtk5-dev python-vtk python-sip python-qt4 libosmesa6-dev meshlab libhdf5-dev libboost-python-dev
+
+# if necessary (probably when without discrete gpu)
+# sudo apt-get install freeglut3-dev libxmu-dev libxi-dev
+
+# if necessary
+# sudo apt-get install python-tk
+
 # install pip deps
-pip install numpy scipy scikit-learn scikit-image opencv-python pyassimp tensorflow h5py mayavi matplotlib catkin_pkg multiprocess dill cvxopt ipython pillow pyhull setproctitle trimesh meshpy
+pip install numpy scipy scikit-learn scikit-image opencv-python pyassimp tensorflow h5py mayavi matplotlib catkin_pkg multiprocess dill cvxopt ipython==5.5.0 pillow pyhull setproctitle trimesh meshpy
 pip install msgpack
 
 # install assimp
@@ -84,12 +91,12 @@ git clone https://github.com/BerkeleyAutomation/meshrender.git
 
 # install meshpy_berkeley
 cd meshpy_berkeley
-python setup.py develop
+sudo python setup.py develop
 cd ../
 
 # install meshrender
 cd meshrender
-python setup.py develop
+sudo python setup.py develop
 cd ../
 
 # install all Berkeley AUTOLAB modules
@@ -98,22 +105,22 @@ in
 python)
 	# autolab_core
 	cd autolab_core
-	python setup.py develop
+	sudo python setup.py develop
 	cd ..
 
 	# perception
 	cd perception
-	python setup.py develop
+	sudo python setup.py develop
 	cd ..
 
 	# gqcnn
 	cd gqcnn
-	python setup.py develop
+	sudo python setup.py develop
 	cd ..
 
 	# visualization
 	cd visualization
-	python setup.py develop
+	sudo python setup.py develop
 	cd ..
 	cd ..
 	;;
@@ -130,4 +137,4 @@ ros)
 esac
 
 # install dex-net
-python setup.py develop
+sudo python setup.py develop
