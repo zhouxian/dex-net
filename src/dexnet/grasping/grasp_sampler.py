@@ -472,9 +472,9 @@ class AntipodalGraspSampler(GraspSampler):
                         for i in range(cone1.shape[1]):
                             ax.scatter(x1_grid[0] - cone1_grid[0], x1_grid[1] - cone1_grid[1], x1_grid[2] - cone1_grid[2], s = 50, c = u'm')
 
-                    # random axis flips since we don't have guarantees on surface normal directoins
-                    if random.random() > 0.5:
-                        v = -v
+                    # # random axis flips since we don't have guarantees on surface normal directoins
+                    # if random.random() > 0.5:
+                    #     v = -v
 
                     # start searching for contacts
                     grasp, c1, c2 = ParallelJawPtGrasp3D.grasp_from_contact_and_axis_on_grid(graspable, x1, v, self.gripper.max_width,

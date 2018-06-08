@@ -73,8 +73,8 @@ class DexNetVisualizer3D(Visualizer3D):
 
     @staticmethod
     def grasp(grasp, T_obj_world=RigidTransform(from_frame='obj', to_frame='world'),
-              tube_radius=0.002, endpoint_color=(0,1,0),
-              endpoint_scale=0.004, grasp_axis_color=(0,1,0)):
+              tube_radius=0.001, endpoint_color=(0,1,0),
+              endpoint_scale=0.002, grasp_axis_color=(0,1,0)):
         """ Plots a grasp as an axis and center.
 
         Parameters

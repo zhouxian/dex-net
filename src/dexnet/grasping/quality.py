@@ -232,7 +232,7 @@ class PointGraspMetrics3D:
         return G
 
     @staticmethod
-    def force_closure(c1, c2, friction_coef, use_abs_value=True):
+    def force_closure(c1, c2, friction_coef, use_abs_value=False):
         """" Checks force closure using the antipodality trick.
 
         Parameters
