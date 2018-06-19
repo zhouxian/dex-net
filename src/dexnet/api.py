@@ -53,7 +53,7 @@ except:
 
 DEXNET_DIR = os.path.realpath(os.path.dirname(os.path.realpath(__file__)) + '/../../') + '/'
 # DEXNET_API_DEFAULTS_FILE = DEXNET_DIR + 'cfg/api_defaults.yaml'
-DEXNET_API_DEFAULTS_FILE = DEXNET_DIR + 'cfg/api_defaults_sample_grasp.yaml'
+DEXNET_API_DEFAULTS_FILE = DEXNET_DIR + 'cfg/semantic_grasping.yaml'
 
 class DexNet(object):
     """Class providing an interface for main DexNet pipeline
@@ -1092,7 +1092,7 @@ class DexNet(object):
                 print 'Grasp %d %s=%.5f' %(grasp.id, metric_name, metric)
                 T_obj_world = RigidTransform(from_frame='obj',
                                              to_frame='world')
-                color = plt.get_cmap('hsv')(q_to_c(metric))[:-1]
+                color = plt.get_cmap('hsv')(q_to_c(metric)*grasp.open_width/0.05)[:-1]
                 T_obj_gripper = grasp.gripper_pose(gripper)
                 vis.grasp(grasp, grasp_axis_color=color,
                           endpoint_color=color)

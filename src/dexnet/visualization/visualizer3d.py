@@ -73,8 +73,8 @@ class DexNetVisualizer3D(Visualizer3D):
 
     @staticmethod
     def grasp(grasp, T_obj_world=RigidTransform(from_frame='obj', to_frame='world'),
-              tube_radius=0.001, endpoint_color=(0,1,0),
-              endpoint_scale=0.002, grasp_axis_color=(0,1,0)):
+              tube_radius=0.0002, endpoint_color=(0,1,0),
+              endpoint_scale=0.0005, grasp_axis_color=(0,1,0)):
         """ Plots a grasp as an axis and center.
 
         Parameters
@@ -106,7 +106,7 @@ class DexNetVisualizer3D(Visualizer3D):
         Visualizer3D.points(g1_tf.data, color=endpoint_color, scale=endpoint_scale)
         Visualizer3D.points(g2_tf.data, color=endpoint_color, scale=endpoint_scale)
         Visualizer3D.plot3d(grasp_axis_tf, color=grasp_axis_color, tube_radius=tube_radius)
-
+        Visualizer3D.pose(grasp.T_grasp_obj, alpha=endpoint_scale*10, tube_radius=tube_radius, center_scale=endpoint_scale)
         # mlab.points3d(g1_tf.data[0], g1_tf.data[1], g1_tf.data[2], color=endpoint_color, scale_factor=endpoint_scale)
         # mlab.points3d(g2_tf.data[0], g2_tf.data[1], g2_tf.data[2], color=endpoint_color, scale_factor=endpoint_scale)
 

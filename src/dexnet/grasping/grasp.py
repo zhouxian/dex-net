@@ -429,7 +429,7 @@ class ParallelJawPtGrasp3D(PointGrasp):
         check_approach : bool
             whether or not to check if the contact points can be reached
         approach_dist : float
-            how far back to check the approach distance, only if checking the approach is set
+            how far back to check the approach distance (times 2), only if checking the approach is set
         
         Returns
         -------
@@ -440,8 +440,6 @@ class ParallelJawPtGrasp3D(PointGrasp):
         c2 : :obj:`Contact3D`
             the contact point for jaw 2
         """
-        # import IPython
-        # IPython.embed()
         # compute num samples to use based on sdf resolution
         grasp_width_grid = obj.sdf.transform_pt_obj_to_grid(self.max_grasp_width_)
         num_samples = int(Grasp.samples_per_grid * float(grasp_width_grid) / 2) # at least 1 sample per grid
@@ -458,6 +456,7 @@ class ParallelJawPtGrasp3D(PointGrasp):
                                                                        num_approach_samples, min_width = 0)
             approach_loa2 = ParallelJawPtGrasp3D.create_line_of_action(g2_world, -approach_axis, approach_dist, obj,
                                                                        num_approach_samples, min_width = 0)
+
             c1_found, _ = ParallelJawPtGrasp3D.find_contact(approach_loa1, obj, vis=vis)
             c2_found, _ = ParallelJawPtGrasp3D.find_contact(approach_loa2, obj, vis=vis)
             approach_collision = c1_found or c2_found
@@ -583,7 +582,7 @@ class ParallelJawPtGrasp3D(PointGrasp):
                     pt_zc = Sdf3D.find_zero_crossing_quadratic(pt_grid, sdf_here, pt_after, sdf_after, pt_after_after, sdf_after_after)
 
                     # contact not yet found if next sdf value is smaller
-                    if pt_zc is None or np.abs(sdf_after) < np.abs(sdf_here):
+                    if pt_zc is None or (np.sign(sdf_after) == np.sign(sdf_here) and np.abs(sdf_after) < np.abs(sdf_here)):
                         contact_found = False
 
 
@@ -599,7 +598,7 @@ class ParallelJawPtGrasp3D(PointGrasp):
                     pt_zc = Sdf3D.find_zero_crossing_quadratic(pt_before, sdf_before, pt_grid, sdf_here, pt_after, sdf_after)
 
                     # contact not yet found if next sdf value is smaller
-                    if pt_zc is None or np.abs(sdf_after) < np.abs(sdf_here):
+                    if pt_zc is None or (np.sign(sdf_after) == np.sign(sdf_here) and np.abs(sdf_after) < np.abs(sdf_here)):
                         contact_found = False
             i = i+1
 

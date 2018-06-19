@@ -235,7 +235,7 @@ class MeshProcessor:
     def _standardize_pose(self):
         """
         Transforms the vertices and normals of the mesh such that the origin of the resulting mesh's coordinate frame is at the
-        centroid and the principal axes are aligned with the vertical Z, Y, and X axes.
+        center of its bounding box and the principal axes are aligned with the vertical Z, Y, and X axes.
         
         Returns:
         Nothing. Modified the mesh in place (for now)
@@ -256,7 +256,8 @@ class MeshProcessor:
         # create rotation from principal axes to standard basis
         z_axis = comp_array[0,:]
         y_axis = comp_array[1,:]
-        if opposite_aligned[2] > same_aligned[2]:
+        # if opposite_aligned[2] > same_aligned[2]:
+        if opposite_aligned[0] > same_aligned[0]:
             z_axis = -z_axis
         if opposite_aligned[1] > same_aligned[1]:
             y_axis = -y_axis
@@ -309,8 +310,8 @@ class MeshProcessor:
         scale_factor = scale / relative_scale 
         vertex_array = scale_factor * vertex_array
         self.mesh_.vertices_ = vertex_array
-        self.mesh_._compute_bb_center()
-        self.mesh_._compute_centroid()
+        self.mesh_.bb_center_ = self.mesh_._compute_bb_center()
+        self.mesh_.centroid_ = self.mesh_._compute_centroid()
         self.mesh_.center_of_mass = self.mesh_.bb_center_
         if use_uniform_com:
             self.mesh_.center_of_mass = self.mesh_._compute_com_uniform()

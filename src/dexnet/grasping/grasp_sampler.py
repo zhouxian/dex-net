@@ -69,6 +69,8 @@ class GraspSampler:
         self.num_cone_faces = config['num_cone_faces']
         self.num_samples = config['grasp_samples_per_surface_point']
         self.target_num_grasps = config['target_num_grasps']
+        self.target_num_grasps_per_size = config['target_num_grasps_per_size']
+        self.openning_ratios = config['openning_ratios']
         if self.target_num_grasps is None:
             self.target_num_grasps = config['min_num_grasps']
 
@@ -134,7 +136,7 @@ class GraspSampler:
                 grasps[stable_pose.id].append(copy.deepcopy(aligned_grasp))
         return grasps
         
-    def generate_grasps(self, graspable, target_num_grasps=None, grasp_gen_mult=5, max_iter=3,
+    def generate_grasps(self, graspable, target_num_grasps_per_size=None, grasp_gen_mult=5, max_iter=3,
                         sample_approach_angles=False, vis=False, **kwargs):
         """Samples a set of grasps for an object.
 
@@ -142,8 +144,6 @@ class GraspSampler:
         ----------
         graspable : :obj:`GraspableObject3D`
             the object to grasp
-        target_num_grasps : int
-            number of grasps to return, defualts to self.target_num_grasps
         grasp_gen_mult : int
             number of additional grasps to generate
         max_iter : int
@@ -159,63 +159,32 @@ class GraspSampler:
         # import IPython
         # IPython.embed()
         # get num grasps 
-        if target_num_grasps is None:
-            target_num_grasps = self.target_num_grasps
-        num_grasps_remaining = target_num_grasps
-
+        target_num_grasps_per_size = self.target_num_grasps_per_size
+        openning_ratios =  self.openning_ratios
+        target_num_grasps = target_num_grasps_per_size * len(openning_ratios)
         grasps = []
-        k = 1
-        while num_grasps_remaining > 0 and k <= max_iter:
-            # SAMPLING: generate more than we need
-            num_grasps_generate = grasp_gen_mult * num_grasps_remaining
-            new_grasps = self.sample_grasps(graspable, num_grasps_generate,
-                                               vis, **kwargs)
-            # new_grasps = self.sample_grasps(graspable, num_grasps_generate,
-            #                                    vis, max_num_samples=100, **kwargs)
-            
-
-            # COVERAGE REJECTION: prune grasps by distance
-            pruned_grasps = []
-            for grasp in new_grasps:
-                min_dist = np.inf
-                for cur_grasp in grasps:
-                    dist = ParallelJawPtGrasp3D.distance(cur_grasp, grasp)
-                    if dist < min_dist:
-                        min_dist = dist
-                for cur_grasp in pruned_grasps:
-                    dist = ParallelJawPtGrasp3D.distance(cur_grasp, grasp)
-                    if dist < min_dist:
-                        min_dist = dist
-                if min_dist >= self.grasp_dist_thresh_:
-                    pruned_grasps.append(grasp)            
-
-            # ANGLE EXPANSION sample grasp rotations around the axis
-            candidate_grasps = []
-            if sample_approach_angles:
-                for grasp in pruned_grasps:
-                    # construct a set of rotated grasps
-                    for i in range(self.num_grasp_rots):
-                        rotated_grasp = copy.copy(grasp)
-                        rotated_grasp.set_approach_angle(i * delta_theta)
-                        candidate_grasps.append(rotated_grasp)                
-            else:
-                candidate_grasps = pruned_grasps
-
-            # add to the current grasp set
-            grasps += candidate_grasps
-            logging.info('%d/%d grasps found after iteration %d.',
-                         len(grasps), target_num_grasps, k)
-
-            grasp_gen_mult *= 2
-            num_grasps_remaining = target_num_grasps - len(grasps)
-            k += 1
-
-        # shuffle computed grasps
+        for openning_ratio in openning_ratios:
+            num_grasps_remaining = target_num_grasps_per_size
+            cur_grasps = []
+            k = 1
+            while num_grasps_remaining > 0 and k <= max_iter:
+                # SAMPLING: generate more than we need
+                new_grasps = self.sample_grasps(graspable, openning_ratio, vis, **kwargs)            
+                # add to the current grasp set
+                cur_grasps += new_grasps
+                logging.info('%d/%d grasps for openning ratio %.1f found after iteration %d.',
+                             len(cur_grasps), target_num_grasps_per_size, openning_ratio, k)
+                num_grasps_remaining = target_num_grasps_per_size - len(cur_grasps)
+                k += 1
+            # shuffle computed grasps
+            random.shuffle(cur_grasps)
+            if len(cur_grasps) > target_num_grasps_per_size:
+                logging.info('Truncating %d grasps to %d.',
+                             len(cur_grasps), target_num_grasps_per_size)
+                cur_grasps = cur_grasps[:target_num_grasps_per_size]
+            grasps += cur_grasps
+        
         random.shuffle(grasps)
-        if len(grasps) > target_num_grasps:
-            logging.info('Truncating %d grasps to %d.',
-                         len(grasps), target_num_grasps)
-            grasps = grasps[:target_num_grasps]
         logging.info('Found %d grasps.', len(grasps))
 
         return grasps
@@ -416,16 +385,13 @@ class AntipodalGraspSampler(GraspSampler):
         x_samp = x + (scale / 2.0) * (np.random.rand(3) - 0.5)
         return x_samp
 
-    def sample_grasps(self, graspable, num_grasps,
-                         vis=False):
+    def sample_grasps(self, graspable, openning_ratio, vis=False):
         """Returns a list of candidate grasps for graspable object.
 
         Parameters
         ----------
         graspable : :obj:`GraspableObject3D`
             the object to grasp
-        num_grasps : int
-            number of grasps to sample
         vis : bool
             whether or not to visualize progress, for debugging
 
@@ -476,15 +442,19 @@ class AntipodalGraspSampler(GraspSampler):
                     # if random.random() > 0.5:
                     #     v = -v
 
+                    # randomly pick grasp width & angle
+                    grasp_width = openning_ratio * self.gripper.max_width
+                    grasp_angle = np.random.rand() * np.pi * 2
+
                     # start searching for contacts
-                    grasp, c1, c2 = ParallelJawPtGrasp3D.grasp_from_contact_and_axis_on_grid(graspable, x1, v, self.gripper.max_width,
+                    grasp, c1, c2 = ParallelJawPtGrasp3D.grasp_from_contact_and_axis_on_grid(graspable, x1, v, grasp_width, 
+                                                                                             grasp_angle=grasp_angle,
                                                                                              min_grasp_width_world=self.gripper.min_width,
                                                                     
                  vis=vis)
                     
                     if grasp is None or c2 is None:
                         continue
-
                     # get true contacts (previous is subject to variation)
                     success, c = grasp.close_fingers(graspable)
                     if not success:
@@ -493,12 +463,16 @@ class AntipodalGraspSampler(GraspSampler):
                     c2 = c[1]
 
                     # make sure grasp is wide enough
-                    x2 = c2.point
-                    if np.linalg.norm(x1 - x2) < self.min_contact_dist:
+                    if np.linalg.norm(c1.point - c2.point) < self.min_contact_dist:
                         continue
 
-                    v_true = grasp.axis
-                    # compute friction cone for contact 2
+                    # update grasp center
+                    grasp.center = ParallelJawPtGrasp3D.center_from_endpoints(c1.point, c2.point)
+
+                    # compute friction cone for new contacts
+                    cone_succeeded, cone1, n1 = c1.friction_cone(self.num_cone_faces, self.friction_coef)
+                    if not cone_succeeded:
+                        continue
                     cone_succeeded, cone2, n2 = c2.friction_cone(self.num_cone_faces, self.friction_coef)
                     if not cone_succeeded:
                         continue

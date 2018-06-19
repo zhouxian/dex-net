@@ -4,12 +4,14 @@ cache_dir: .dexnet
 
 grasp_sampler: antipodal
 target_num_grasps: 100
+target_num_grasps_per_size: 100
+openning_ratios: [0.2, 0.4, 0.6, 0.8, 1.0]
 num_grasp_rots: 32
 grasp_dist_thresh: 0.0025
 
-sampling_friction_coef: 0.75
+sampling_friction_coef: 0.5
 num_cone_faces: 8
-max_grasp_sampling_iters: 10
+max_grasp_sampling_iters: 20
 max_num_surface_points: 100
 grasp_samples_per_surface_point: 2
 min_contact_dist: 0.0000
@@ -26,7 +28,7 @@ obj_density: 4000.0
 
 use_uniform_com: True
 
-rescale_objects: True
+rescale_objects: False
 obj_target_scale: 0.040
 obj_scaling_mode: min
 
