@@ -450,6 +450,70 @@ class DexNet(object):
                 grasps_stop = time.time()
                 logger.info('Sampling grasps took %.3f sec' %(grasps_stop - grasps_start))
             
+    def down_sample_grasps(self, config=None, object_name=None, gripper_name=None):
+        self._check_opens()
+        config = self._get_config(config)
+        
+        grippers = os.listdir(config['gripper_dir'])
+        if gripper_name is not None:
+            if gripper_name in grippers:
+                grippers = [gripper_name]
+            else:
+                raise ValueError("{} is not a valid gripper name".format(gripper_name))
+        
+        objects = self.dataset.object_keys
+        if object_name is not None:
+            if object_name in objects:
+                objects = [object_name]
+            else:
+                raise ValueError("{} is not a valid object name".format(object_name))
+        
+        for gripper_name in grippers:
+            gripper = gr.RobotGripper.load(gripper_name, gripper_dir=config['gripper_dir'])
+            for object_name in objects:
+                if self.dataset.has_grasps(object_name, gripper=gripper.name):
+                    logger.info('Down sampling grasps for object %s' %(object_name))
+                    grasps = self.dataset.grasps(object_name, gripper=gripper.name)
+                    down_sample_start = time.time()
+                    obj = self.dataset[object_name]
+                    down_sampled_grasps = gs.GraspSampler.down_sample_grasps(obj, grasps, gamma_center=1, gamma_axis=0.2, gamma_variances=1, gamma_width=0.5, num_samples=50)
+
+                    vis.figure()
+                    vis.mesh(obj.mesh.trimesh, style='surface')
+                    for grasp in down_sampled_grasps:
+                        print 'Grasp %d' %(grasp.id)
+                        color = plt.get_cmap('hsv')(0.3*grasp.open_width/0.05)[:-1]
+                        vis.grasp(grasp, grasp_axis_color=color,
+                                  endpoint_color=color)
+
+                    vis.show()
+
+
+
+                    # self.dataset.delete_grasps(object_name, gripper=gripper.name)
+                    # self.dataset.store_grasps(obj.key, down_sampled_grasps, gripper=gripper.name)
+                    # self.database.flush()
+                    # down_sample_stop = time.time()
+                    # logger.info('Down sampling grasps took %.3f sec' %(down_sample_start - down_sample_stop))
+                else:
+                    logger.warning("Grasps do not exist for object {}, gripper {}. ".format(object_name, gripper.name)+
+                                    "Cannot cluster")
+                    continue
+
+    def custom(self, config=None, object_name=None, gripper_name=None):
+        self._check_opens()
+        config = self._get_config(config)
+        
+        gripper = gr.RobotGripper.load(gripper_name, gripper_dir=config['gripper_dir'])
+        obj = self.dataset[object_name]
+        import IPython;IPython.embed()
+        from dexnet.visualization import DexNetVisualizer3D as vis
+        surface_points, _ = obj.sdf.surface_points(grid_basis=False)
+        vis.figure(bgcolor=(1,1,1), size=(500,500))
+        # vis.mesh(obj.mesh.trimesh, color=(0.5, 0.5, 0.5), style='surface')
+        vis.points(surface_points, scale=0.0001, color=(0,1,0))
+        vis.show()
+
     @staticmethod
     def _gravity_wrench(obj, stable_pose, gravity_accel):
         """ Compute the wrench exerted by gravity. Helper method for compute_metrics """

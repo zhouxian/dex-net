@@ -9,7 +9,7 @@ openning_ratios: [0.2, 0.4, 0.6, 0.8, 1.0]
 num_grasp_rots: 32
 grasp_dist_thresh: 0.0025
 
-sampling_friction_coef: 0.5
+sampling_friction_coef: 0.3
 num_cone_faces: 8
 max_grasp_sampling_iters: 20
 max_num_surface_points: 100

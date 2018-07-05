@@ -34,6 +34,7 @@ import os
 import random
 import sys
 import time
+import sklearn
 
 USE_OPENRAVE = True
 try:
@@ -97,6 +98,53 @@ class GraspSampler:
             object to sample grasps on
         """
         pass
+
+    @staticmethod
+    def down_sample_grasps(graspable, grasps, gamma_center=1, gamma_axis=0.05, gamma_variances=0.2, gamma_width=0.2, num_samples=50, max_iter=20):
+        surface_points, _ = graspable.sdf.surface_points(grid_basis=False)
+        np.random.shuffle(surface_points)
+        pca = sklearn.decomposition.PCA(n_components = 3)
+
+        datapoints = []
+        for grasp in grasps:
+            local_radius = grasp.max_grasp_width_
+            distances = grasp.center - surface_points
+            local_points = surface_points[np.where(np.linalg.norm(distances, axis=1) < local_radius)]
+            pca.fit(local_points)
+            variances_ratio = pca.explained_variance_ratio_
+            datapoints.append(np.hstack((gamma_center*grasp.center, gamma_axis*grasp.axis, gamma_variances*variances_ratio, gamma_width*grasp.max_grasp_width_)))
+        max_dist = 0
+        for datapoint1 in datapoints:
+            for datapoint2 in datapoints:
+                dist = np.linalg.norm((datapoint1 - datapoint2))
+                if max_dist < dist:
+                    max_dist = dist
+        dist_thresh = max_dist
+        sampled_ids = []
+        it = 1
+        while len(sampled_ids) < num_samples and it < max_iter:
+            num_samples_remaining = num_samples - len(sampled_ids)
+            cur_sampled_ids = []
+            for i, datapoint in enumerate(datapoints):
+                min_dist = np.inf
+                for j in sampled_ids:
+                    dist = np.linalg.norm((datapoint - datapoints[j]))
+                    if dist < min_dist:
+                        min_dist = dist
+                for j in cur_sampled_ids:
+                    dist = np.linalg.norm((datapoint - datapoints[j]))
+                    if dist < min_dist:
+                        min_dist = dist
+                if min_dist > dist_thresh:
+                    cur_sampled_ids.append(i)
+            if len(cur_sampled_ids) > num_samples_remaining:
+                np.random.shuffle(cur_sampled_ids)
+                cur_sampled_ids = cur_sampled_ids[:num_samples_remaining]
+            sampled_ids += cur_sampled_ids
+            dist_thresh /= 2.0
+            it += 1
+
+        return list(np.array(grasps)[sampled_ids])
 
     def generate_grasps_stable_poses(self, graspable, stable_poses, target_num_grasps=None, grasp_gen_mult=5, max_iter=3,
                         sample_approach_angles=False, vis=False, **kwargs):
@@ -163,17 +211,17 @@ class GraspSampler:
         openning_ratios =  self.openning_ratios
         target_num_grasps = target_num_grasps_per_size * len(openning_ratios)
         grasps = []
-        for openning_ratio in openning_ratios:
+        for openning_ratio_id in range(len(openning_ratios)):
             num_grasps_remaining = target_num_grasps_per_size
             cur_grasps = []
             k = 1
             while num_grasps_remaining > 0 and k <= max_iter:
                 # SAMPLING: generate more than we need
-                new_grasps = self.sample_grasps(graspable, openning_ratio, vis, **kwargs)            
+                new_grasps = self.sample_grasps(graspable, openning_ratio_id, openning_ratios, vis, **kwargs)            
                 # add to the current grasp set
                 cur_grasps += new_grasps
                 logging.info('%d/%d grasps for openning ratio %.1f found after iteration %d.',
-                             len(cur_grasps), target_num_grasps_per_size, openning_ratio, k)
+                             len(cur_grasps), target_num_grasps_per_size, openning_ratios[openning_ratio_id], k)
                 num_grasps_remaining = target_num_grasps_per_size - len(cur_grasps)
                 k += 1
             # shuffle computed grasps
@@ -188,6 +236,7 @@ class GraspSampler:
         logging.info('Found %d grasps.', len(grasps))
 
         return grasps
+
 
 class UniformGraspSampler(GraspSampler):
     """ Sample grasps by sampling pairs of points on the object surface uniformly at random.    
@@ -385,13 +434,17 @@ class AntipodalGraspSampler(GraspSampler):
         x_samp = x + (scale / 2.0) * (np.random.rand(3) - 0.5)
         return x_samp
 
-    def sample_grasps(self, graspable, openning_ratio, vis=False):
+    def sample_grasps(self, graspable, openning_ratio_id, openning_ratios, vis=False):
         """Returns a list of candidate grasps for graspable object.
 
         Parameters
         ----------
         graspable : :obj:`GraspableObject3D`
             the object to grasp
+        openning_ratio_id : int
+            initial gripper openning ratio for sampling; not actual grasp openning ratio
+        openning_ratios : list
+            all possible opening ratios
         vis : bool
             whether or not to visualize progress, for debugging
 
@@ -443,7 +496,7 @@ class AntipodalGraspSampler(GraspSampler):
                     #     v = -v
 
                     # randomly pick grasp width & angle
-                    grasp_width = openning_ratio * self.gripper.max_width
+                    grasp_width = openning_ratios[openning_ratio_id] * self.gripper.max_width
                     grasp_angle = np.random.rand() * np.pi * 2
 
                     # start searching for contacts
@@ -477,23 +530,26 @@ class AntipodalGraspSampler(GraspSampler):
                     if not cone_succeeded:
                         continue
 
-                    if vis:
-                        plt.figure()
-                        ax = plt.gca(projection='3d')
-                        c1_proxy = c1.plot_friction_cone(color='m')
-                        c2_proxy = c2.plot_friction_cone(color='y')
-                        ax.view_init(elev=5.0, azim=0)
-                        plt.show(block=False)
-                        time.sleep(0.5)
-                        plt.close() # lol
-
                     # check friction cone
                     if PointGraspMetrics3D.force_closure(c1, c2, self.friction_coef):
+                        # try to find minimum possible openning width
+                        original_max_width = grasp.max_grasp_width_
+                        for index in range(openning_ratio_id):
+                            grasp.max_grasp_width_ = openning_ratios[index] * self.gripper.max_width
+                            success, _ = grasp.close_fingers(graspable)
+                            if success:
+                                break
+                            else:
+                                grasp.max_grasp_width_ = original_max_width
                         grasps.append(grasp)
 
         # randomly sample max num grasps from total list
         random.shuffle(grasps)
         return grasps
+
+
+
+
 
 
 

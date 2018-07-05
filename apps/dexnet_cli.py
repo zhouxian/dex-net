@@ -127,7 +127,9 @@ class DexNet_cli(object):
            11:('Export objects', 'export_objects'),
            12:('Set config (advanced)', 'set_config'),
            13:('Quit', 'close'),
-           14:('Custom', 'custom')
+           14:('Custom', 'custom'),
+           15:('Custom2', 'custom2'),
+           16:('Custom3', 'custom3')
            }
 
     def __init__(self):
@@ -217,6 +219,57 @@ class DexNet_cli(object):
             return False
     
     # commands below
+    def custom2(self):
+        # open database
+        self.dexnet_api.close_database()
+        database_name = 'y'
+        if os.path.splitext(database_name)[1] == '':
+            database_name += dexnet.HDF5_EXT
+        try:
+            self.dexnet_api.open_database(database_name, create_db=True)
+            print('Opened database %s' %(database_name))
+            print
+            existing_datasets = [d.name for d in self.dexnet_api.database.datasets]
+            if len(existing_datasets) == 1:
+                dataset_name = existing_datasets[0]
+                self.dexnet_api.open_dataset(dataset_name)
+                print('Database has one dataset, opened dataset {}'.format(dataset_name))
+        except Exception as e:
+            print("Opening database failed: {}".format(str(e)))
+        
+        # gripper_name = 'yumi_metal_spline'
+        # object_name = 'mug_2852b888abae54b0e3523e99fd841f4'
+        # metric_name = 'force_closure'
+        # self.dexnet_api.custom(object_name, gripper_name, metric_name)
+        # sample grasps
+        if not self._check_opens(): return True
+        gripper_name = 'yumi_metal_spline'
+        object_name = 'mug_normal'
+        metric_name = 'force_closure'
+        
+        try:
+            self.dexnet_api.down_sample_grasps(object_name=None if object_name is '' else object_name,
+                                          gripper_name=None if gripper_name is '' else gripper_name)
+        except Exception as e:
+            print("Down sampling grasps failed: {}".format(str(e)))
+
+        # # compute metric
+        # if metric_name is None: return True
+        
+        # try:
+        #     self.dexnet_api.compute_metrics(metric_name=None if metric_name is '' else metric_name,
+        #                                     object_name=None if object_name is '' else object_name,
+        #                                     gripper_name=None if gripper_name is '' else gripper_name)
+        # except Exception as e:
+        #     print("Computing metrics failed: {}".format(str(e)))
+        
+        # # display grasps
+        # try:
+        #     self.dexnet_api.display_grasps(object_name, gripper_name, metric_name)
+        # except Exception as e:
+        #     print("Display grasps failed: {}".format(str(e)))
+        return True
+
     def custom(self):
         # open database
         self.dexnet_api.close_database()
@@ -267,6 +320,37 @@ class DexNet_cli(object):
         except Exception as e:
             print("Display grasps failed: {}".format(str(e)))
         return True
+
+    def custom3(self):
+        # open database
+        self.dexnet_api.close_database()
+        database_name = 'y'
+        if os.path.splitext(database_name)[1] == '':
+            database_name += dexnet.HDF5_EXT
+        try:
+            self.dexnet_api.open_database(database_name, create_db=True)
+            print('Opened database %s' %(database_name))
+            print
+            existing_datasets = [d.name for d in self.dexnet_api.database.datasets]
+            if len(existing_datasets) == 1:
+                dataset_name = existing_datasets[0]
+                self.dexnet_api.open_dataset(dataset_name)
+                print('Database has one dataset, opened dataset {}'.format(dataset_name))
+        except Exception as e:
+            print("Opening database failed: {}".format(str(e)))
+        
+        # gripper_name = 'yumi_metal_spline'
+        # object_name = 'mug_2852b888abae54b0e3523e99fd841f4'
+        # metric_name = 'force_closure'
+        # self.dexnet_api.custom(object_name, gripper_name, metric_name)
+        # sample grasps
+        if not self._check_opens(): return True
+        gripper_name = 'yumi_metal_spline'
+        object_name = 'mug_normal'
+        metric_name = 'force_closure'
+        
+        self.dexnet_api.custom(object_name=None if object_name is '' else object_name,
+                                      gripper_name=None if gripper_name is '' else gripper_name)
 
     def open_database(self):
         """ Open a database """
